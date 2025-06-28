@@ -1,0 +1,59 @@
+<%- include('components/header') %>
+
+<div class="container">
+  <h2 class="page-title">Avaliação do Classificador</h2>
+
+  <div class="card">
+    <h3>Matriz de Confusão</h3>
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th></th>
+          <% for (let sentiment in matrix) { %>
+            <th><%= sentiment %></th>
+          <% } %>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (let actual in matrix) { %>
+          <tr>
+            <th><%= actual %></th>
+            <% for (let predicted in matrix[actual]) { %>
+              <td><%= matrix[actual][predicted] %></td>
+            <% } %>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Métricas</h3>
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th>Classe</th>
+          <th>Accuracy</th>
+          <th>Precision</th>
+          <th>Recall</th>
+          <th>F1-score</th>
+          <th>Support</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (let cls in metrics) { %>
+          <tr>
+            <td><%= cls %></td>
+            <td><%= metrics[cls].accuracy %></td>
+            <td><%= metrics[cls].precision %></td>
+            <td><%= metrics[cls].recall %></td>
+            <td><%= metrics[cls].f1 %></td>
+            <td><%= metrics[cls].support %></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('components/footer') %>

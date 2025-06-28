@@ -1,0 +1,76 @@
+
+    <%- include('components/header') -%>
+
+    <main>
+      <div>
+        <label for="review-filter"><strong>Show:</strong></label>
+        <select id="review-filter" onchange="toggleReviews()">
+          <option value="positive">Positive Reviews</option>
+          <option value="negative">Negative Reviews</option>
+        </select>
+      </div>
+
+      <div id="positive-reviews-section">
+        <h2>Raw Positive Reviews</h2>
+        <% if (positiveReviews && positiveReviews.length > 0) { %>
+          <table class="reviews-table">
+            <thead>
+              <tr>
+                <th>Nº</th>
+                <th>Review</th> 
+                <th>Sentiment</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% positiveReviews.forEach(function(review, idx) { %>
+                <tr>
+                  <td><%= idx + 1 %></td>
+                  <td><%= review.Review || review.text %></td>
+                  <td><%= review.Sentiment || review.sentiment %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } else { %>
+          <p>No positive reviews found.</p>
+        <% } %>
+      </div>
+
+      <div id="negative-reviews-section" style="display:none;">
+        <h2>Raw Negative Reviews</h2>
+        <% if (negativeReviews && negativeReviews.length > 0) { %>
+          <table class="reviews-table">
+            <thead>
+              <tr>
+                <th>Nº</th>
+                <th>Review</th> 
+                <th>Sentiment</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% negativeReviews.forEach(function(review, idx) { %>
+                <tr>
+                  <td><%= idx + 1 %></td>
+                  <td><%= review.Review || review.text %></td>
+                  <td><%= review.Sentiment || review.sentiment %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } else { %>
+          <p>No positive reviews found.</p>
+        <% } %>
+      </div>
+
+      <script>
+        function toggleReviews() {
+          const filter = document.getElementById('review-filter').value;
+          document.getElementById('positive-reviews-section').style.display = filter === 'positive' ? '' : 'none';
+          document.getElementById('negative-reviews-section').style.display = filter === 'negative' ? '' : 'none';
+        }
+      </script>
+    </main>
+
+
+  <%- include('components/footer') -%>
+

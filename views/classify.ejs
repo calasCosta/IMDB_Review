@@ -1,0 +1,61 @@
+<%- include('components/header') %>
+
+<div class="container">
+
+  <h2 class="page-title">Análise de Sentimentos</h2>
+
+  <form action="/classify" method="POST" class="card form-card">
+    <div class="form-group">
+      <textarea name="text" id="text" rows="6" placeholder="Escreva aqui a sua crítica..." required><%= typeof text !== 'undefined' ? text : '' %></textarea>
+    </div>
+
+    <div class="form-group">
+      <select name="model" id="model" required>
+        <option value="" disabled <%= !model ? 'selected' : '' %>>Escolhe o classificador</option>
+        <option value="cosine" <%= model === 'cosine' ? 'selected' : '' %>>Cosine Similarity</option>
+        <option value="bayes" <%= model === 'bayes' ? 'selected' : '' %>>Naive Bayes</option>
+      </select>
+    </div>
+
+    <div class="form-group btn-container">
+      <button type="submit" class="btn btn-primary">Classificar</button>
+    </div>
+  </form>
+
+  <% if (result) { %>
+    <div class="card result-card">
+      <h3>Resultado da Classificação</h3>
+      <p class="result-label">
+        <strong>Classe prevista:</strong>
+        <span class="badge <%= result.predictedClass === 'positive' ? 'badge-positive' : 'badge-negative' %>">
+          <%= result.predictedClass %>
+        </span>
+      </p>
+
+      <% if (result.scores) { %>
+        <div class="score-section">
+          <h4>Probabilidades (Naive Bayes):</h4>
+          <ul class="score-list">
+            <% for (let cls in result.scores) { %>
+              <li><strong><%= cls %>:</strong> <%= result.scores[cls].toFixed(4) %></li>
+            <% } %>
+          </ul>
+        </div>
+      <% } %>
+
+      <% if (result.similarities) { %>
+        <div class="score-section">
+          <h4>Similaridade (Cosine):</h4>
+          <ul class="score-list">
+            <% for (let cls in result.similarities) { %>
+              <li><strong><%= cls %>:</strong> <%= result.similarities[cls].toFixed(4) %></li>
+            <% } %>
+          </ul>
+        </div>
+      <% } %>
+    </div>
+  <% } %>
+
+</div>
+
+<%- include('components/footer') %>
