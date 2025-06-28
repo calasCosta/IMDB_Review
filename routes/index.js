@@ -10,7 +10,7 @@ router.get('/', async function(req, res, next) {
   var positiveReviews = await getPositiveReviewOriginalSet(100);
   var negativeReviews = await getNegativeReviewOriginalSet(100);
 
-  test();
+  //test();
 
   getConnection()
     .then(connection => {

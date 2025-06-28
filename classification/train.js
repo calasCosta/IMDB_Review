@@ -104,7 +104,7 @@ async function train(classes = ['positive', 'negative'], nValues = [1, 2], limit
             });
 
             const vocabLength = n === 1 ? unigramsBag.length : bigramsBag.length;
-            const K = Math.max(20, Math.round(vocabLength * kFactor));
+            const K = Math.max(50, Math.round(vocabLength * kFactor));
 
             let topK = selectKBest(tfidfTerms, K, 'tfidf', 'sum') || [];
 
@@ -125,7 +125,7 @@ async function train(classes = ['positive', 'negative'], nValues = [1, 2], limit
             topKPerN[n] = topK;
 
             console.log(`Classe ${className} n=${n} → topK=${K} termos + críticos`);
-            console.table(topK.slice(0, 20).map(t => ({ name: t.name, tfidf: t.tfidf.toFixed(4) })));
+            console.table(topK.slice(0, 10).map(t => ({ name: t.name, tfidf: t.tfidf.toFixed(4) })));
         }
 
         const prior = await calculateClassPriorProbability(className);

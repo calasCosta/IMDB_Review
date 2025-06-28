@@ -27,18 +27,6 @@ router.get('/train', async function(req, res, next) {
         trainedData = await train(['positive', 'negative'], [1, 2], globalLimit);
     }
 
-    //------------------------- stats test ---------------------
-    // const trueLabels = ['positive', 'negative', 'positive', 'positive', 'negative'];
-    // const predicted = ['positive', 'positive', 'positive', 'negative', 'negative'];
-
-    // const matrix = createConfusionMatrix(trueLabels, predicted);
-    // printConfusionMatrix(matrix);
-
-    // const metrics = calculateMetrics(matrix);
-    // console.log("\nMetrics:", metrics);
-
-    // ----------------- end stats test ----------------------
-
     //console.log(result);
     res.json(trainedData);
     //res.render('index', { title: 'IMDB Review'});
@@ -117,7 +105,8 @@ router.get('/stats', async (req, res) => {
 
     // 3. Classificar os textos
     for (const item of testSet) {
-      const result = await probabilisticClassification(item.text, trainedData, [1, 2]);
+      // const result = await probabilisticClassification(item.text, trainedData, [1, 2]);
+      const result = await cosineSimilarity(item.text, trainedData, [1, 2]);
       trueLabels.push(item.sentiment);
       predictedLabels.push(result.predictedClass);
     }

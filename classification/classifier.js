@@ -12,10 +12,8 @@ function calculateCosineSimilarity(A, B) {
 async function cosineSimilarity(text, trainedData, nValues = [1, 2]) {
     const processed = await preprocessText(text, nValues);
     const similarities = {};
-    const criticalPositive = ['love', 'good', 'great', 'fantastic', 'excellent', 'wonderful', 'amazing', 'best', 'like', 'enjoy', 
-                                'happy', 'perfect', 'awesome', 'superb', 'fabulous', 'delightful', 'pleased', 'satisfied', 'adore', 'appreciate'];
-    const criticalNegative = ['bad', 'worst', 'not_good', 'dont_love', 'horrible', 'bore', 'terribl', 'awful', 'disappointing', 'hate', 
-                                'terrible', 'dissatisfied', 'unhappy', 'regret', 'frustrating', 'displeased', 'annoying', 'waste', 'poor', 'mediocre'];
+    const criticalPositive = ['love', 'good', 'great', 'fantastic', 'excellent', 'wonderful', 'amazing'];
+    const criticalNegative = ['bad', 'worst', 'not_good', 'dont_love', 'horrible', 'bore', 'terribl', 'not_love'];
 
     for (const className in trainedData) {
         let allSimilarities = [];
@@ -39,26 +37,31 @@ async function cosineSimilarity(text, trainedData, nValues = [1, 2]) {
         }
 
         let avgSimilarity = allSimilarities.reduce((sum, s) => sum + s, 0) / allSimilarities.length;
-        avgSimilarity += 0.2 * directHits; // boost mais forte
+        avgSimilarity += 0.2 * directHits;
 
         const flatTokens = processed.preprocessedText.split(' ');
+
         if (className === 'positive') {
             criticalPositive.forEach(term => {
-                if (flatTokens.includes(term)) avgSimilarity += 0.1;
+                if (flatTokens.includes(term)) avgSimilarity += 0.2;
             });
+            avgSimilarity *= 1.1;
         } else {
             criticalNegative.forEach(term => {
-                if (flatTokens.includes(term)) avgSimilarity += 0.1;
+                if (flatTokens.includes(term)) avgSimilarity += 0.2;
             });
+            flatTokens.forEach(token => {
+                if (token.startsWith('not_')) avgSimilarity += 0.2;
+            });
+            avgSimilarity *= 0.95;
         }
 
         similarities[className] = avgSimilarity;
     }
 
-    // fallback preferindo positive em empate
     const diff = Math.abs(similarities['positive'] - similarities['negative']);
     let predictedClass = similarities['positive'] > similarities['negative'] ? 'positive' : 'negative';
-    if (diff < 0.02) {
+    if (diff < 0.05) {
         console.log(`⚠ Similaridade muito próxima (${diff.toFixed(4)}), default para positive`);
         predictedClass = 'positive';
     }

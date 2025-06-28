@@ -12,13 +12,14 @@ const { removeGeneralStopwords, removeCustomStopwords } = require('./stopwords')
 const { applyStemming } = require('./stemming');
 const { generateNGrams } = require('./tokenization');
 
-// Handle negations robusto (not good -> not_good, dont love -> dont_love, etc)
+// Handle negations robusto (not good -> not_good, dont love -> not_love, isn't -> not_is)
 function handleNegations(text) {
-    if (typeof text !== 'string') return '';
-
-    // padrão: negação seguida de qualquer palavra (pelo menos 1 letra)
-    return text.replace(/\b(not|no|never|dont|doesnt|didnt|isnt|wasnt|shouldnt|wouldnt|couldnt|won't|can't|n't)\s+([a-z]+)/g,
-        (match, neg, word) => `${neg}_${word}`);
+    return text
+        .replace(/\b(do not|don't|doesn't|didn't|never|not|isn't|wasn't|aren't|weren't|can't|couldn't|shouldn't|won't|wouldn't|hasn't|haven't|hadn't|n't)\s+(\w+)/gi, 'not_$2')
+        .replace(/\b(no|none|nothing|nowhere|neither|nobody|nor)\b\s*(\w+)?/gi, (match, p1, p2) => {
+            if (p2) return `not_${p2}`;
+            return `not_${p1}`;
+        });
 }
 
 async function preprocessText(text, nValues = [1], customStopwords = []) {
@@ -28,18 +29,18 @@ async function preprocessText(text, nValues = [1], customStopwords = []) {
     // Step 2: Handle negations forte
     const negHandled = handleNegations(cleanedText);
 
-    // Step 3: Remove stopwords
-    let withoutStopwords;
+    // Step 3: Remove stopwords (custom ou general)
+    let tokensWithoutStopwords;
     if (customStopwords.length > 0) {
-        withoutStopwords = removeCustomStopwords(negHandled, customStopwords);
+        tokensWithoutStopwords = removeCustomStopwords(negHandled, customStopwords);
     } else {
-        withoutStopwords = removeGeneralStopwords(negHandled);
+        tokensWithoutStopwords = removeGeneralStopwords(negHandled);
     }
 
     // Step 4: Apply stemming
-    const preprocessedText = applyStemming(withoutStopwords);
+    const preprocessedText = applyStemming(tokensWithoutStopwords);
 
-    // Step 5: Generate tokens
+    // Step 5: Generate n-grams
     const tokens = nValues.map(n => ({
         n,
         tokens: generateNGrams(preprocessedText, n) || []
@@ -54,4 +55,4 @@ async function preprocessText(text, nValues = [1], customStopwords = []) {
     };
 }
 
-module.exports = { preprocessText };
+module.exports = { preprocessText, handleNegations };
