@@ -5,12 +5,22 @@ Stemming reduz palavras às suas raízes, para que variações gramaticais não 
 - Aumentar a robustez do classificador (palavras com mesmo significado tratadas como iguais).
 */
 
-const stemmer = require('porter-stemmer').stemmer;
+const natural = require('natural');
+const stemmer = natural.PorterStemmer;
 
-function applyStemming(text) {
-    return text.split(' ')
-              .map(word => stemmer(word))
-              .join(' ');
+// Aplica stemming a cada palavra de um array ou string
+function applyStemming(input) {
+    let words = [];
+
+    if (Array.isArray(input)) {
+        words = input;
+    } else if (typeof input === 'string') {
+        words = input.split(' ');
+    } else {
+        throw new TypeError("applyStemming requires a string or an array of words");
+    }
+
+    return words.map(word => stemmer.stem(word)).join(' ');
 }
 
 module.exports = { applyStemming };

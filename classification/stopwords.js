@@ -6,13 +6,21 @@
 
 const { removeStopwords } = require('stopword');
 
+/**
+ * Remove stopwords gerais.
+ * Retorna um array de palavras filtradas.
+ */
 function removeGeneralStopwords(text) {
-    const oldString = text.split(' ');
-    return removeStopwords(oldString).join(' ');
+    const words = text.split(' ');
+    return removeStopwords(words);  // retorna array
 }
 
+/**
+ * Remove stopwords gerais e depois remove stopwords customizadas.
+ * Retorna a string final.
+ */
 function removeCustomStopwords(text, customStopwords = []) {
-    const generalCleaned = removeGeneralStopwords(text);
+    const generalCleaned = removeGeneralStopwords(text); // array
     const customCleaned = generalCleaned.filter(word => !customStopwords.includes(word));
     return customCleaned.join(' ');
 }

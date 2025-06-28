@@ -1,9 +1,8 @@
-const { getCorpus, getTotalRows, getClassCount} = require('../database/corpus.js');
+const { getCorpus, getTotalRows, getClassCount } = require('../database/corpus.js');
 const { preprocessText } = require('./preprocessing.js');
 const bag = require('./bagOfWords.js');
 const { selectKBest } = require('./featureSelection.js');
 
-// Calcula a P(ω) da classe (probabilidade a priori)
 async function calculateClassPriorProbability(sentiment) {
     const total = await getTotalRows();
     const classCount = await getClassCount(sentiment);
@@ -12,8 +11,18 @@ async function calculateClassPriorProbability(sentiment) {
     return prior;
 }
 
+customStopwords = [
+    'a', 'an', 'the', 'and', 'or', 'but', 'is', 'are', 'was', 'were',
+    'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'this',
+    'that', 'it', 'its', 'they', 'them', 'he', 'she', 'his',
+    'her', 'we', 'us'
+];
+
 async function train(classes = ['positive', 'negative'], nValues = [1, 2], limit = 10) {
     const results = {};
+
+    // criticalTerms: sempre incluídos no topK
+    const criticalTerms = ['good', 'bad', 'not_good', 'not_bad', 'love', 'dont_love', 'horrible', 'fantastic'];
 
     for (const className of classes) {
         console.log(`\n🔍 Treinando classe ${className}`);
@@ -22,23 +31,16 @@ async function train(classes = ['positive', 'negative'], nValues = [1, 2], limit
         const preprocessedDocs = await Promise.all(
             documents.map(async doc => {
                 const reviewText = typeof doc.Review === 'string' ? doc.Review : '';
-                const processed = await preprocessText(reviewText, nValues);
-                return {
-                    id: doc.id,
-                    sentiment: doc.sentiment,
-                    processed
-                };
+                const processed = await preprocessText(reviewText, nValues, customStopwords);
+                return { id: doc.id, sentiment: doc.sentiment, processed };
             })
         );
 
-        // Inicializa vocabulários
         let unigramsBag = [];
         let bigramsBag = [];
-
         const allUnigramDocs = [];
         const allBigramDocs = [];
 
-        // Atualiza vocabulários e armazena tokens por doc
         preprocessedDocs.forEach(doc => {
             const unigramTokens = doc.processed?.tokens?.[0]?.tokens || [];
             const bigramTokens = doc.processed?.tokens?.[1]?.tokens || [];
@@ -53,9 +55,8 @@ async function train(classes = ['positive', 'negative'], nValues = [1, 2], limit
             }
         });
 
-        console.log(`Classe ${className} → Unigrams únicos: ${unigramsBag.length}, Bigrams únicos: ${bigramsBag.length}`);
+        console.log(`Classe ${className} → Unigrams: ${unigramsBag.length}, Bigrams: ${bigramsBag.length}`);
 
-        // Calcula IDF
         const idfUnigrams = bag.idfVector(unigramsBag, allUnigramDocs);
         const idfBigrams = bag.idfVector(bigramsBag, allBigramDocs);
 
@@ -82,9 +83,8 @@ async function train(classes = ['positive', 'negative'], nValues = [1, 2], limit
             };
         });
 
-        // SelectKBest
         const topKPerN = {};
-        const kFactor = 0.2;
+        const kFactor = 0.5;
 
         for (const n of nValues) {
             const tfidfTerms = documentsWithVectors.flatMap(doc => {
@@ -95,14 +95,28 @@ async function train(classes = ['positive', 'negative'], nValues = [1, 2], limit
             });
 
             const vocabLength = n === 1 ? unigramsBag.length : bigramsBag.length;
-            const K = Math.max(10, Math.round(vocabLength * kFactor));
+            const K = Math.max(20, Math.round(vocabLength * kFactor));
 
-            const topK = selectKBest(tfidfTerms, K, 'tfidf', 'sum') || [];
+            let topK = selectKBest(tfidfTerms, K, 'tfidf', 'sum') || [];
+
+            // 🔥 Adiciona criticalTerms manualmente se não estão no topK
+            criticalTerms.forEach(term => {
+                if (!topK.some(t => t.name === term)) {
+                    topK.push({
+                        name: term,
+                        tfidf: 0.01,
+                        binary: 1,
+                        occurrences: 1,
+                        tf: 0.01,
+                        idf: 1
+                    });
+                }
+            });
+
             topKPerN[n] = topK;
 
-            console.log(`Classe ${className} n=${n} → tfidfTerms válidos: ${tfidfTerms.length}`);
-            console.log(`Top ${K} termos para n=${n}:`);
-            console.table(topK.slice(0, 5).map(t => ({ name: t.name, tfidf: t.tfidf.toFixed(4) })));
+            console.log(`Classe ${className} n=${n} → topK=${K} termos + críticos`);
+            console.table(topK.slice(0, 20).map(t => ({ name: t.name, tfidf: t.tfidf.toFixed(4) })));
         }
 
         const prior = await calculateClassPriorProbability(className);
