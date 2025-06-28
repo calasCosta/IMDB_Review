@@ -11,14 +11,23 @@ async function calculateClassPriorProbability(sentiment) {
     return prior;
 }
 
-customStopwords = [
-    'a', 'an', 'the', 'and', 'or', 'but', 'is', 'are', 'was', 'were',
-    'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'this',
-    'that', 'it', 'its', 'they', 'them', 'he', 'she', 'his',
-    'her', 'we', 'us'
+const customStopwords = [
+  // super frequentes neutros em ambos
+  'movi', 'film', 'like', 'she', 'realli', 'charact', 'seri', 'it', 'know', 'made', 'music',
+  'stori', 'funni', 'seen', 'act', 'actor', 'show', 'plot', 'plai', 'think', 'better',
+  'goldsworthi', 'littl', 'origin', 'excel', 'make', 'great', 'new', 'world', 'camp',
+
+  // conectivos e palavras de ligação
+  'on', 'so', 'just', 'even', 'when', 'will', 'time', 'mom', 'hell', 'old', 'young',
+
+  // stemming colapsado
+  'good movi', 'love movi', 'ever seen', 'funni movi', 'movi tri', 'movi hell', 
+  'mom like', 'like itgreat', 'itgreat camp', 'jacki chan', 'betti boop', 'karen carpent', 
+  'bui copi', 'origin gut', 'gut wrench', 'wrench laughter', 'laughter movi'
 ];
 
-async function train(classes = ['positive', 'negative'], nValues = [1, 2], limit = 10) {
+
+async function train(classes = ['positive', 'negative'], nValues = [1, 2], limit = 100) {
     const results = {};
 
     // criticalTerms: sempre incluídos no topK

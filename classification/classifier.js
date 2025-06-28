@@ -12,6 +12,10 @@ function calculateCosineSimilarity(A, B) {
 async function cosineSimilarity(text, trainedData, nValues = [1, 2]) {
     const processed = await preprocessText(text, nValues);
     const similarities = {};
+    const criticalPositive = ['love', 'good', 'great', 'fantastic', 'excellent', 'wonderful', 'amazing', 'best', 'like', 'enjoy', 
+                                'happy', 'perfect', 'awesome', 'superb', 'fabulous', 'delightful', 'pleased', 'satisfied', 'adore', 'appreciate'];
+    const criticalNegative = ['bad', 'worst', 'not_good', 'dont_love', 'horrible', 'bore', 'terribl', 'awful', 'disappointing', 'hate', 
+                                'terrible', 'dissatisfied', 'unhappy', 'regret', 'frustrating', 'displeased', 'annoying', 'waste', 'poor', 'mediocre'];
 
     for (const className in trainedData) {
         let allSimilarities = [];
@@ -34,19 +38,29 @@ async function cosineSimilarity(text, trainedData, nValues = [1, 2]) {
             });
         }
 
-        const avgSimilarity = allSimilarities.reduce((sum, s) => sum + s, 0) / allSimilarities.length;
-        similarities[className] = avgSimilarity + 0.1 * directHits;
+        let avgSimilarity = allSimilarities.reduce((sum, s) => sum + s, 0) / allSimilarities.length;
+        avgSimilarity += 0.2 * directHits; // boost mais forte
+
+        const flatTokens = processed.preprocessedText.split(' ');
+        if (className === 'positive') {
+            criticalPositive.forEach(term => {
+                if (flatTokens.includes(term)) avgSimilarity += 0.1;
+            });
+        } else {
+            criticalNegative.forEach(term => {
+                if (flatTokens.includes(term)) avgSimilarity += 0.1;
+            });
+        }
+
+        similarities[className] = avgSimilarity;
     }
 
+    // fallback preferindo positive em empate
     const diff = Math.abs(similarities['positive'] - similarities['negative']);
-    let predictedClass = Object.keys(similarities).reduce((a, b) =>
-        similarities[a] > similarities[b] ? a : b
-    );
-
+    let predictedClass = similarities['positive'] > similarities['negative'] ? 'positive' : 'negative';
     if (diff < 0.02) {
-        console.log(`⚠ Similaridade próxima (${diff.toFixed(4)}), usando NB para desempatar`);
-        const nbResult = await probabilisticClassification(text, trainedData, nValues);
-        predictedClass = nbResult.predictedClass;
+        console.log(`⚠ Similaridade muito próxima (${diff.toFixed(4)}), default para positive`);
+        predictedClass = 'positive';
     }
 
     console.log(`\n[COSINE] "${text}"`);
