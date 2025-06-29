@@ -5,11 +5,12 @@ const { selectKBest } = require('./featureSelection.js');
 
 const customStopwords = [
     'movi', 'film', 'see', 'watch', 'on', 'wait', 'no', 'go', 'thing', 'director', 
-    'she', 'realli', 'charact', 'seri', 'it', 'know', 'made', 'music',
+    'she', 'realli', 'charact', 'seri', 'it', 'know', 'made', 'music', 'mario', 'karen',
     'stori', 'funni', 'seen', 'act', 'actor', 'show', 'plot', 'plai', 'think', 'better',
-    'goldsworthi', 'littl', 'origin', 'excel', 'make', 'new', 'world', 'camp',
-    'so', 'just', 'even', 'when', 'will', 'time', 'mom', 'hell', 'old', 'young',
-    'gut', 'wrench', 'feel', 'laugh', 'laugher', 'ever', 'tri', 'itgreat',
+    'goldsworthi', 'littl', 'origin', 'excel', 'make', 'new', 'world', 'camp', 'laughter',
+    'so', 'just', 'even', 'when', 'will', 'time', 'mom', 'hell', 'old', 'young', 'look',
+    'gut', 'wrench', 'feel', 'laugh', 'laugher', 'ever', 'tri', 'itgreat', 'scene',
+    'lot', 'good', 'cinema', 'carpent', 'davi', 'goldi',
     'ever seen', 'funni movi', 'movi tri', 'movi hell', 
     'mom like', 'like itgreat', 'itgreat camp', 'jacki chan', 'betti boop', 'karen carpent', 
     'bui copi', 'origin gut', 'gut wrench', 'wrench laughter', 'laughter movi'
@@ -29,7 +30,7 @@ async function train(classes = ['positive', 'negative'], nValues = [1, 2], limit
     const results = {};
 
     for (const className of classes) {
-        console.log(`\n🔍 Trainning class ${className}`);
+        console.log(`\n Trainning class ${className}`);
         const documents = await getCorpus(className, limit);
 
         const preprocessedDocs = await Promise.all(

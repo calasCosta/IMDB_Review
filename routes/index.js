@@ -18,9 +18,9 @@ const {
 let trainedData = null;
 
 // Treinamento inicial
-var globalLimit = 50; 
+var globalLimit = 4; 
 
-router.get('/', async function(req, res, next) {
+router.get('/', async (req, res) => {
   var positiveReviews = await getPositiveReviewOriginalSet(globalLimit);
   var negativeReviews = await getNegativeReviewOriginalSet(globalLimit);
 
@@ -42,8 +42,7 @@ router.get('/', async function(req, res, next) {
 });
 
 
-/* GET home page. */
-router.get('/train', async function(req, res, next) {
+router.get('/training', async (req, res) => {
 
     // Treinar primeiro:
     // Treinar apenas uma vez se ainda não estiver treinado
@@ -52,8 +51,10 @@ router.get('/train', async function(req, res, next) {
     }
 
     //console.log(result);
-    res.json(trainedData);
-    //res.render('index', { title: 'IMDB Review'});
+    //res.json(trainedData);
+    res.render('training', { 
+      trainedData
+    });
 });
 
 

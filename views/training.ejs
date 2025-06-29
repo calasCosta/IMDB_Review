@@ -1,0 +1,58 @@
+
+<%- include('components/header') %>
+
+<% for (let className in trainedData) { 
+     let classData = trainedData[className]; %>
+  <div class="card" style="margin-bottom:32px;">
+    <h3>
+      <span class="badge <%= className === 'positive' ? 'badge-positive' : 'badge-negative' %>">
+        <%= className %>
+      </span>
+      <small style="color:#888;">Prior: <%= classData.priorProbability?.toFixed(4) %></small>
+    </h3>
+
+    <h4>Documents</h4>
+    <% (classData.documents.slice(0, 3) || []).forEach(doc => { %>
+      <div class="doc-block" style="margin-bottom:18px; padding:12px; border:1px solid #eee; border-radius:8px;">
+        <b>ID:</b> <%= doc.id %> | <b>Sentiment:</b> <%= doc.sentiment %>
+        <br>
+        <b>Original Text:</b>
+        <div style="background:#f8f8f8; border-radius:6px; padding:8px; margin-bottom:4px;">
+          <%= doc.processed?.originalText || '[not available]' %>
+        </div>
+        <b>Cleaned Text:</b>
+        <div style="background:#f8f8f8; border-radius:6px; padding:8px; margin-bottom:4px;">
+          <%= doc.processed?.cleanedText || '[not available]' %>
+        </div>
+        <b>Negation Handled:</b>
+        <div style="background:#f8f8f8; border-radius:6px; padding:8px; margin-bottom:4px;">
+          <%= doc.processed?.negHandled || '[not available]' %>
+        </div>
+        <b>Preprocessed Text:</b>
+        <div style="background:#f8f8f8; border-radius:6px; padding:8px; margin-bottom:4px;">
+          <%= doc.processed?.preprocessedText || '[not available]' %>
+        </div>
+        <b>Tokens:</b>
+        <div style="background:#f8f8f8; border-radius:6px; padding:8px; margin-bottom:4px;">
+          <%= (doc.processed?.tokens || []).join(', ') %>
+        </div>
+        <b>Unigram Vectors (sample):</b>
+        <ul>
+          <% (doc.vectors?.unigrams?.tf || []).slice(0, 5).forEach(term => { %>
+            <li><b><%= term.name %></b>: TF = <%= term.tf %></li>
+          <% }) %>
+        </ul>
+        <% if (doc.vectors?.bigrams?.tf) { %>
+        <b>Bigram Vectors (sample):</b>
+        <ul>
+          <% (doc.vectors.bigrams.tf || []).slice(0, 5).forEach(term => { %>
+            <li><b><%= term.name %></b>: TF = <%= term.tf %></li>
+          <% }) %>
+        </ul>
+        <% } %>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('components/footer') %>
