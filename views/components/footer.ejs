@@ -1,18 +1,34 @@
-<footer>
-    <div id="about">
-        <p>about this app</p>
-        <p>This application is designed to help users manage their tasks efficiently. It provides features such as task creation, editing, and deletion, along with user authentication.</p>
-        <p>© 2023 Your Company Name. All rights reserved.</p>
-        
+<footer id="about">
+  <div class="footer-container">
+    <div class="footer-about">
+      <h4><span style="font-size:1.2em;vertical-align:middle;">🎬</span> About this app</h4>
+      <p>
+        This application performs automatic sentiment classification on movie reviews, combining classic NLP techniques with modern feature engineering.<br>
+        <b>Hybrid approach:</b> Cosine Similarity and Naive Bayes to identify whether a text is positive or negative.
+      </p>
+      <ul>
+        <li>TF-IDF of unigrams and bigrams, domain-specific stopwords, and robust negation handling (<code>not_like</code>, <code>not_good</code>).</li>
+        <li>Cosine Similarity: sensitive to the overall distribution of terms, high recall for positives.</li>
+        <li>Naive Bayes: complementary precision, tie-breaking by probabilities and smoothing.</li>
+      </ul>
+      <p style="font-size:0.97em;color:#888;">
+        Project developed for the Automatic Information Extraction course.<br>
+        <span style="font-size:1.1em;">© 2025 Your Name/Institution</span>
+      </p>
     </div>
-    <div id="contact">
-        <p>contact us</p>
-        <p>Follow us on:
-            <a href="https://www.facebook.com" target="_blank">Facebook</a>,
-            <a href="https://www.twitter.com" target="_blank">Twitter</a>,
-            <a href="https://www.instagram.com" target="_blank">Instagram</a>
-        </p>
+    <div class="footer-contact">
+      <h4><span style="font-size:1.2em;vertical-align:middle;">✉️</span> Contact</h4>
+      <p>
+        Questions or suggestions? <br>
+        <a href="mailto:seuemail@dominio.com">seuemail@dominio.com</a>
+      </p>
+      <p>
+        <a href="https://github.com/calasCosta/IMDB_Review" target="_blank" style="color:#333;">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/github.svg" alt="GitHub" style="width:20px;vertical-align:middle;margin-right:4px;"> Project GitHub
+        </a>
+      </p>
     </div>
+  </div>
 </footer>
 </body>
 </html>

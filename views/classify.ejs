@@ -2,7 +2,7 @@
 
 <div class="container">
 
-  <h2 class="page-title">Análise de Sentimentos</h2>
+  <h2 class="page-title">Sentiment Analysis</h2>
 
   <form action="/classify" method="POST" class="card form-card">
     <div class="form-group">
@@ -18,15 +18,15 @@
     </div>
 
     <div class="form-group btn-container">
-      <button type="submit" class="btn btn-primary">Classificar</button>
+      <button type="submit" class="btn btn-primary">Classify</button>
     </div>
   </form>
 
   <% if (result) { %>
     <div class="card result-card">
-      <h3>Resultado da Classificação</h3>
+      <h3>Classification Result</h3>
       <p class="result-label">
-        <strong>Classe prevista:</strong>
+        <strong>Positive Class:</strong>
         <span class="badge <%= result.predictedClass === 'positive' ? 'badge-positive' : 'badge-negative' %>">
           <%= result.predictedClass %>
         </span>

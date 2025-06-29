@@ -8,7 +8,7 @@ Stemming reduz palavras às suas raízes, para que variações gramaticais não 
 const natural = require('natural');
 const stemmer = natural.PorterStemmer;
 
-// Aplica stemming a cada palavra de um array ou string
+// Aplica stemming a cada palavra, preservando "not_" intacto
 function applyStemming(input) {
     let words = [];
 
@@ -20,7 +20,11 @@ function applyStemming(input) {
         throw new TypeError("applyStemming requires a string or an array of words");
     }
 
-    return words.map(word => stemmer.stem(word)).join(' ');
+    return words.map(word => {
+        if (word.startsWith('not_')) return word; // preserva not_ tokens intactos
+        return stemmer.stem(word);
+    }).join(' ');
 }
 
 module.exports = { applyStemming };
+

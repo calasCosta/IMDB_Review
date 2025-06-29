@@ -31,7 +31,7 @@ function cleanQuotes(text) {
 
 function keepAlphabeticOnly(text) {
     if (typeof text !== 'string') return '';
-    return text.replace(/[^a-zA-Z\s]/g, '');
+    return text.replace(/[^a-zA-Z_\s]/g, '');
 }
 
 function cleanText(text) {

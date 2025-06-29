@@ -1,5 +1,6 @@
 const {  cosineSimilarity, probabilisticClassification} = require('./classifier.js');
 const { train } = require('./train.js');     
+const { preprocessText } = require('./preprocessing');
 
 async function test(){
     const trainedData = await train(['positive', 'negative']);
@@ -20,7 +21,11 @@ async function test(){
     // }
 
 //     await cosineSimilarity("This is good", trainedData, [1,2]);
-// await probabilisticClassification("This is good", trainedData, [1,2]);
+// // await probabilisticClassification("This is good", trainedData, [1,2]);
+
+    const result = await preprocessText("i don't like it", [1,2]);
+    console.log(result);
+    await cosineSimilarity("i don't like it", trainedData, [1,2]);
 }
 
 test().catch(console.error);

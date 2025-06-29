@@ -2,16 +2,20 @@
     <%- include('components/header') -%>
 
     <main>
-      <div>
-        <label for="review-filter"><strong>Show:</strong></label>
-        <select id="review-filter" onchange="toggleReviews()">
-          <option value="positive">Positive Reviews</option>
-          <option value="negative">Negative Reviews</option>
-        </select>
+
+      <h2>Raw Reviews</h2>
+      <div class="filter-form">
+        <form action="">
+          <label for="review-filter"><strong>Show:</strong></label>
+          <select id="review-filter" onchange="toggleReviews()">
+            <option value="positive">Positive Reviews</option>
+            <option value="negative">Negative Reviews</option>
+          </select>
+        </form>
       </div>
 
       <div id="positive-reviews-section">
-        <h2>Raw Positive Reviews</h2>
+        
         <% if (positiveReviews && positiveReviews.length > 0) { %>
           <table class="reviews-table">
             <thead>
@@ -37,7 +41,6 @@
       </div>
 
       <div id="negative-reviews-section" style="display:none;">
-        <h2>Raw Negative Reviews</h2>
         <% if (negativeReviews && negativeReviews.length > 0) { %>
           <table class="reviews-table">
             <thead>

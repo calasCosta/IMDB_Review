@@ -53,6 +53,10 @@ async function cosineSimilarity(text, trainedData, nValues = [1, 2]) {
             flatTokens.forEach(token => {
                 if (token.startsWith('not_')) avgSimilarity += 0.2;
             });
+            // Penaliza se termos fortes positivos aparecem
+            criticalPositive.forEach(term => {
+                if (flatTokens.includes(term)) avgSimilarity -= 0.1;
+            });
             avgSimilarity *= 0.95;
         }
 
@@ -66,9 +70,9 @@ async function cosineSimilarity(text, trainedData, nValues = [1, 2]) {
         predictedClass = 'positive';
     }
 
-    console.log(`\n[COSINE] "${text}"`);
-    console.log(`Similarities:`, similarities);
-    console.log(`→ Predicted class: ${predictedClass}`);
+    // console.log(`\n[COSINE] "${text}"`);
+    // console.log(`Similarities:`, similarities);
+    // console.log(`→ Predicted class: ${predictedClass}`);
 
     return { predictedClass, similarities };
 }

@@ -3,9 +3,21 @@
 <div class="container">
   <h2 class="page-title">Avaliação do Classificador</h2>
 
+  <div class="filter-form">
+    <form method="POST" action="/stats" style="margin-bottom:20px;">
+        <label for="limit">Limit:</label>
+        <select name="limit" id="limit" onchange="this.form.submit()">
+            <option value="50" <%= limit == 50 ? 'selected' : '' %>>50</option>
+            <option value="100" <%= limit == 100 ? 'selected' : '' %>>100</option>
+            <option value="200" <%= limit == 200 ? 'selected' : '' %>>200</option>
+            <option value="500" <%= limit == 500 ? 'selected' : '' %>>500</option>
+        </select>
+    </form>
+  </div>  
+
   <div class="card">
-    <h3>Matriz de Confusão</h3>
-    <table class="matrix-table">
+    <h3>Confusion Matrix</h3>
+    <table class="matrics-table">
       <thead>
         <tr>
           <th></th>
@@ -28,7 +40,7 @@
   </div>
 
   <div class="card">
-    <h3>Métricas</h3>
+    <h3>Metrics</h3>
     <table class="metrics-table">
       <thead>
         <tr>
@@ -53,6 +65,43 @@
         <% } %>
       </tbody>
     </table>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Top terms by class</h3>
+  <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+    <% for (let className in trainedData) {  
+         let classData = trainedData[className]; %>
+      <div style="flex:1; min-width: 320px; border:1px solid #eee; border-radius:8px; padding:16px; margin-bottom:16px;">
+        <h4>
+          <span class="badge <%= className === 'positive' ? 'badge-positive' : 'badge-negative' %>">
+            <%= className %>
+          </span>
+          <small style="color:#888;">P(<%= className %>) = <%= classData.priorProbability?.toFixed(3) %></small>
+        </h4>
+        <table class="metrics-table">
+          <tr>
+            <th style="background:#eafaf1;color:#27ae60;">Unigram</th>
+            <th style="background:#eafaf1;color:#27ae60;">TFIDF</th>
+            <th style="background:#fdeaea;color:#e74c3c;">Bigram</th>
+            <th style="background:#fdeaea;color:#e74c3c;">TFIDF</th>
+          </tr>
+          <% 
+            const unis = classData.topKPerN?.[1]?.slice(0, 10) || [];
+            const bis = classData.topKPerN?.[2]?.slice(0, 10) || [];
+            for(let i=0; i<Math.max(unis.length, bis.length); i++) { 
+          %>
+            <tr>
+              <td><%= unis[i]?.name || '' %></td>
+              <td><%= unis[i] ? unis[i].tfidf.toFixed(4) : '' %></td>
+              <td><%= bis[i]?.name || '' %></td>
+              <td><%= bis[i] ? bis[i].tfidf.toFixed(4) : '' %></td>
+            </tr>
+          <% } %>
+        </table>
+      </div>
+    <% } %>
   </div>
 </div>
 

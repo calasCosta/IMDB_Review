@@ -16,7 +16,7 @@ const { getCorpus, getNegativeReviewOriginalSet, getPositiveReviewOriginalSet } 
 let trainedData = null;
 
 // Treinamento inicial
-const globalLimit = 100; 
+var globalLimit = 50; 
 
 /* GET home page. */
 router.get('/train', async function(req, res, next) {
@@ -86,6 +86,7 @@ router.post('/classify', async (req, res) => {
 
 router.get('/stats', async (req, res) => {
   try {
+
     // 1. Obter textos reais da BD
     const positiveReviews = await getPositiveReviewOriginalSet(globalLimit);
     const negativeReviews = await getNegativeReviewOriginalSet(globalLimit);
@@ -120,16 +121,26 @@ router.get('/stats', async (req, res) => {
       trueLabels,
       predictedLabels,
       matrix,
-      metrics
+      metrics,
+      limit: globalLimit,
+      trainedData
     });
 
   } catch (error) {
-    console.error('Erro em /stats:', error);
+    console.error('Error on /stats:', error);
     res.render('error', {
-      message: 'Erro ao gerar estatísticas.',
+      message: 'Error occurred while processing statistics.',
       error
     });
   }
+});
+
+router.post('/stats', async (req, res) => {
+    // 1️ Obter limite do query string ou default para 100
+    const limit = parseInt(req.body.limit) || 0;
+    globalLimit = limit; // Limitar a 1000 para evitar sobrecarga
+
+    res.redirect(`/stats`);
 });
 
 module.exports = router;
