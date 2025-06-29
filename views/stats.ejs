@@ -7,6 +7,7 @@
     <form method="POST" action="/stats" style="margin-bottom:20px;">
         <label for="limit">Limit:</label>
         <select name="limit" id="limit" onchange="this.form.submit()">
+          <option value="10" <%= limit == 10 ? 'selected' : '' %>>10</option>
             <option value="50" <%= limit == 50 ? 'selected' : '' %>>50</option>
             <option value="100" <%= limit == 100 ? 'selected' : '' %>>100</option>
             <option value="200" <%= limit == 200 ? 'selected' : '' %>>200</option>
@@ -17,7 +18,7 @@
 
   <div class="card">
     <h3>Confusion Matrix</h3>
-    <table class="matrics-table">
+    <table class="matrics-table metrics-table">
       <thead>
         <tr>
           <th></th>
@@ -70,6 +71,17 @@
 
 <div class="card">
   <h3>Top terms by class</h3>
+  <div class="filter-form">
+    <form method="POST" action="/stats" style="margin-bottom:20px;">
+        <label for="topKLimit">Limit:</label>
+        <select name="topKLimit" id="topKLimit">
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+        </select>
+    </form>
+  </div>  
   <div style="display: flex; gap: 24px; flex-wrap: wrap;">
     <% for (let className in trainedData) {  
          let classData = trainedData[className]; %>
@@ -88,11 +100,11 @@
             <th style="background:#fdeaea;color:#e74c3c;">TFIDF</th>
           </tr>
           <% 
-            const unis = classData.topKPerN?.[1]?.slice(0, 10) || [];
-            const bis = classData.topKPerN?.[2]?.slice(0, 10) || [];
+            const unis = classData.topKPerN?.[1] || [];
+            const bis = classData.topKPerN?.[2] || [];
             for(let i=0; i<Math.max(unis.length, bis.length); i++) { 
           %>
-            <tr>
+            <tr data-index="<%= i %>">
               <td><%= unis[i]?.name || '' %></td>
               <td><%= unis[i] ? unis[i].tfidf.toFixed(4) : '' %></td>
               <td><%= bis[i]?.name || '' %></td>
@@ -104,5 +116,21 @@
     <% } %>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  function filterRows() {
+    const limit = parseInt(document.getElementById('topKLimit').value, 10);
+    document.querySelectorAll('.metrics-table').forEach(table => {
+      const rows = table.querySelectorAll('tbody tr[data-index]');
+      rows.forEach((row, idx) => {
+        row.style.display = idx < limit ? '' : 'none';
+      });
+    });
+  }
+  document.getElementById('topKLimit').addEventListener('change', filterRows);
+  filterRows(); // Initial call
+});
+</script>
 
 <%- include('components/footer') %>
