@@ -100,7 +100,7 @@ async function train(classes = ['positive', 'negative'], nValues = [1, 2], limit
 
             let topK = selectKBest(tfidfTerms, K, 'tfidf', 'sum') || [];
 
-            // 🧹 Remove stopwords at the final stage (single or multi-word)
+            // Remove stopwords at the final stage (single or multi-word)
             const stopwordSet = new Set(customStopwords);
             topK = topK.filter(term => {
                 const parts = term.name.split(' ');

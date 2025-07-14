@@ -16,6 +16,16 @@ function createConfusionMatrix(trueLabels, predictedLabels, classes = ['positive
     return matrix;
 }
 
+/**
+ * Creates a confusion matrix for classification results.
+ * @param {Array} trueLabels - Array of true class labels.
+ * @param {Array} predictedLabels - Array of predicted class labels.
+ * @param {Array} classes - Array of possible class names (default: ['positive', 'negative']).
+ * @returns {Object} Confusion matrix as a nested object: matrix[actual][predicted].
+ *
+ * For each pair of true and predicted labels, increments the corresponding cell in the matrix.
+ * The matrix helps visualize the performance of a classification model by showing counts of correct and incorrect predictions for each class.
+ */
 function calculateMetrics(matrix, classes = ['positive', 'negative']) {
     const metrics = {};
 
