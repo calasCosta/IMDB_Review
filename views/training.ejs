@@ -1,4 +1,3 @@
-
 <%- include('components/header') %>
 
 <% for (let className in trainedData) { 
@@ -11,43 +10,37 @@
       <small style="color:#888;">Prior: <%= classData.priorProbability?.toFixed(4) %></small>
     </h3>
 
-    <h4>Documents</h4>
-    <% (classData.documents.slice(0, 3) || []).forEach(doc => { %>
-      <div class="doc-block" style="margin-bottom:18px; padding:12px; border:1px solid #eee; border-radius:8px;">
-        <b>ID:</b> <%= doc.id %> | <b>Sentiment:</b> <%= doc.sentiment %>
-        <br>
-        <b>Original Text:</b>
-        <div style="background:#f8f8f8; border-radius:6px; padding:8px; margin-bottom:4px;">
-          <%= doc.processed?.originalText || '[not available]' %>
-        </div>
-        <b>Cleaned Text:</b>
-        <div style="background:#f8f8f8; border-radius:6px; padding:8px; margin-bottom:4px;">
-          <%= doc.processed?.cleanedText || '[not available]' %>
-        </div>
-        <b>Preprocessed Text:</b>
-        <div style="background:#f8f8f8; border-radius:6px; padding:8px; margin-bottom:4px;">
-          <%= doc.processed?.preprocessedText || '[not available]' %>
-        </div>
-        <b>Tokens:</b>
-        <div style="background:#f8f8f8; border-radius:6px; padding:8px; margin-bottom:4px;">
-          <%= (doc.processed?.tokens || []).join(', ') %>
-        </div>
-        <b>Unigram Vectors (sample):</b>
-        <ul>
-          <% (doc.vectors?.unigrams?.tf || []).slice(0, 5).forEach(term => { %>
-            <li><b><%= term.name %></b>: TF = <%= term.tf %></li>
-          <% }) %>
-        </ul>
-        <% if (doc.vectors?.bigrams?.tf) { %>
-        <b>Bigram Vectors (sample):</b>
-        <ul>
-          <% (doc.vectors.bigrams.tf || []).slice(0, 5).forEach(term => { %>
-            <li><b><%= term.name %></b>: TF = <%= term.tf %></li>
-          <% }) %>
-        </ul>
-        <% } %>
-      </div>
-    <% }) %>
+    <h4>Top Terms (Unigrams & Bigrams)</h4>
+    <% for (let n in classData.topKPerN) { %>
+      <b><%= n === "1" ? "Unigrams" : "Bigrams" %>:</b>
+      <ul>
+        <% classData.topKPerN[n].slice(0, 10).forEach(term => { %>
+          <li>
+            <b><%= term.name %></b>
+            (TF-IDF: <%= term.tfidf?.toFixed(4) %>)
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+
+    <h4>IDF Values</h4>
+    <% for (let n in classData.idfPerN) { %>
+      <b><%= n === "1" ? "Unigrams" : "Bigrams" %>:</b>
+      <ul>
+        <% classData.idfPerN[n].slice(0, 10).forEach(term => { %>
+          <li>
+            <b><%= term.name %></b>
+            (IDF: <%= term.idf?.toFixed(4) %>)
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+
+    <h4>Vocabulary Size</h4>
+    <% for (let n in classData.vocabPerN) { %>
+      <b><%= n === "1" ? "Unigrams" : "Bigrams" %>:</b>
+      <span><%= classData.vocabPerN[n].length %> terms</span>
+    <% } %>
   </div>
 <% } %>
 
