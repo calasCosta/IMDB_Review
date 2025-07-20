@@ -21,20 +21,21 @@
       <thead>
         <tr>
           <th></th>
-          <% for (let sentiment in matrix) { %>
-            <th><%= sentiment %></th>
-          <% } %>
+          <th>Actually Positive</th>
+          <th>Actually Negative</th>
         </tr>
       </thead>
       <tbody>
-        <% for (let actual in matrix) { %>
-          <tr>
-            <th><%= actual %></th>
-            <% for (let predicted in matrix[actual]) { %>
-              <td><%= matrix[actual][predicted] %></td>
-            <% } %>
-          </tr>
-        <% } %>
+        <tr>
+          <th>Predicted Positive</th>
+          <td><%= matrix.positive?.positive || 0 %></td> <!-- True Positives -->
+          <td><%= matrix.negative?.positive || 0 %></td> <!-- False Positives -->
+        </tr>
+        <tr>
+          <th>Predicted Negative</th>
+          <td><%= matrix.positive?.negative || 0 %></td> <!-- False Negatives -->
+          <td><%= matrix.negative?.negative || 0 %></td> <!-- True Negatives -->
+        </tr>
       </tbody>
     </table>
   </div>

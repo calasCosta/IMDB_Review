@@ -118,14 +118,21 @@ router.get('/stats', async (req, res) => {
 
     let statsResult =  await getStatsResults(limit);
 
+    let trainedData = await loadLatestTrainedModel('bayes_ngram', limit);
+    if (!trainedData) {
+      trainedData = await train(['positive', 'negative'], [1, 2], limit);
+      await saveTrainedModel('bayes_ngram', trainedData, limit );
+    }
+
     if (statsResult && statsResult.length > 0) {
+
       let statsData = {
         trueLabels: statsResult[0].true_labels,
         predictedLabels: statsResult[0].predicted_labels,
         matrix: statsResult[0].matrix,
         metrics: statsResult[0].metrics,
         limit,
-        trainedData: statsResult[0].trained_data
+        trainedData,
       }
       return res.render('stats', statsData);
     }
@@ -140,12 +147,6 @@ router.get('/stats', async (req, res) => {
 
     const trueLabels = [];
     const predictedLabels = [];
-
-    let trainedData = await loadLatestTrainedModel('bayes_ngram', limit);
-    if (!trainedData) {
-      trainedData = await train(['positive', 'negative'], [1, 2], limit);
-      await saveTrainedModel('bayes_ngram', trainedData, limit );
-    }
 
     for (const item of testSet) {
       const result = await cosineSimilarity(item.text, trainedData, [1, 2]);
@@ -162,10 +163,10 @@ router.get('/stats', async (req, res) => {
       matrix,
       metrics,
       limit,
+      //trainedData,
     };
     
     await saveStatsResult(statsData);
-
     statsData.trainedData = trainedData;
     res.render('stats', statsData);
 
