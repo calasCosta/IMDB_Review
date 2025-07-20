@@ -6,12 +6,12 @@ const { train } = require('../classification/train.js');
 const { cosineSimilarity, probabilisticClassification } = require('../classification/classifier.js');
 
 const { createConfusionMatrix, calculateMetrics } = require('../classification/stats.js');
-const { saveTrainedModel, loadLatestTrainedModel } = require('../database/trainedModels.js'); // novo módulo
+const { saveTrainedModel, loadLatestTrainedModel } = require('../database/trainedModels.js');
+const { saveStatsResult, getStatsResults } = require('../database/statsResults');
+
+const { validateText } = require('../classification/languageCheck');
 
 var globalLimit = 200;
-
-// Simple cache for stats results
-const statsCache = {};
 
 // GET / — index
 router.get('/', async (req, res) => {
@@ -58,7 +58,8 @@ router.get('/classify', (req, res) => {
   res.render('classify', {
     result: null,
     text: '',
-    model: 'cosine'
+    model: 'cosine',
+    error: null
   });
 });
 
@@ -66,14 +67,26 @@ router.get('/classify', (req, res) => {
 router.post('/classify', async (req, res) => {
   const { text, model } = req.body;
   const selectedModel = model === 'bayes' ? 'bayes' : 'cosine';
+  let textScore = 0;
+
+  let validationTextResult = await validateText(text);
+
+  console.log('Validation Results:');
+  console.log('Overall Valid:', validationTextResult.isValid);
+  console.log('Spelling Errors:', validationTextResult.spellingErrors);
+  console.log('Grammar Errors:', validationTextResult.grammarErrors);
+  textScore = validationTextResult.score;
+  console.log('Quality Score:', textScore);
+
 
   try {
-    if (!text || typeof text !== 'string' || text.trim().length === 0) {
+    if (!text || typeof text !== 'string' || text.trim().length === 0 || textScore < 90) {
+      console.log('Invalid text or low quality score:', text, textScore);
       return res.render('classify', {
         result: null,
         text,
         model: selectedModel,
-        error: 'Texto inválido. Por favor insira uma crítica para classificar.'
+        error: `Invalid text. Your current text score is ${textScore}. Ensure it has a quality score of at least 90.`
       });
     }
 
@@ -90,23 +103,31 @@ router.post('/classify', async (req, res) => {
       result = await probabilisticClassification(text, trainedData, [1, 2]);
     }
 
-    res.render('classify', { text, model: selectedModel, result });
+    res.render('classify', { text, model: selectedModel, result, error: null});
 
   } catch (error) {
     console.error('Erro ao classificar:', error);
     res.render('error', { message: 'Erro ao classificar o texto.', error });
   }
 });
-
+ 
 // GET /stats — avalia classificador
 router.get('/stats', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || globalLimit;
 
-    const cacheKey = `${limit}`;
-    if (statsCache[cacheKey]) {
-      console.log('Serving /stats from cache');
-      return res.render('stats', statsCache[cacheKey]);
+    let statsResult =  await getStatsResults(limit);
+
+    if (statsResult && statsResult.length > 0) {
+      let statsData = {
+        trueLabels: statsResult[0].true_labels,
+        predictedLabels: statsResult[0].predicted_labels,
+        matrix: statsResult[0].matrix,
+        metrics: statsResult[0].metrics,
+        limit,
+        trainedData: statsResult[0].trained_data
+      }
+      return res.render('stats', statsData);
     }
 
     const positiveReviews = await getPositiveReviewOriginalSet(limit);
@@ -141,11 +162,11 @@ router.get('/stats', async (req, res) => {
       matrix,
       metrics,
       limit,
-      trainedData
     };
+    
+    await saveStatsResult(statsData);
 
-    statsCache[cacheKey] = statsData; // Save to cache
-
+    statsData.trainedData = trainedData;
     res.render('stats', statsData);
 
   } catch (error) {

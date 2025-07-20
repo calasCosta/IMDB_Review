@@ -284,6 +284,21 @@ h1, h2, h3 {
   padding: 4px 0;
 }
 
+.alert {
+  max-width: 800px;
+  margin: auto;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.alert-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
 /* ======= Footer ======= */
 footer {
   

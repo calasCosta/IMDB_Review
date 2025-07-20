@@ -21,12 +21,12 @@ async function getCorpus(sentiment, limit = 100) {
     }
 }
 
-async function insertCorpus(Review, Sentiment) {
+async function insertCorpus(review, sentiment) {
     const connection = await getConnection(); 
 
     try {
         const sql = `INSERT INTO corpus (Review, Sentiment) VALUES (?, ?)`;
-        const [result] = await connection.execute(sql, [Review, Sentiment]);
+        const [result] = await connection.execute(sql, [review, sentiment]);
         return result;
     } finally {
         await connection.end(); 
@@ -45,18 +45,17 @@ async function getTotalRows(){
     }
 }
 
- async function getClassCount(Sentiment) {
+async function getClassCount(sentiment) {
     const connection = await getConnection(); 
 
     try {
         const sql = `SELECT COUNT(*) as total FROM eai_final_project.corpus WHERE Sentiment = ?`;
-        const [rows] = await connection.execute(sql, [Sentiment]);   
-        return rows[0].total;
+        const [rows] = await connection.execute(sql, [sentiment]);   
+        return rows[0].total; 
     } finally {
         await connection.end(); 
     }
-    
- }
+}
 
 module.exports = {
     getPositiveReviewOriginalSet,

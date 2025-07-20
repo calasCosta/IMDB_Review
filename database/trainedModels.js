@@ -1,4 +1,4 @@
-const { getConnection } = require('./config'); // ajusta o path se estiver noutra pasta
+const { getConnection } = require('./config');
 
 function getMinimalModel(trainedData) {
   const minimal = {};
@@ -14,7 +14,7 @@ function getMinimalModel(trainedData) {
   return minimal;
 } 
 
-// Salva o modelo treinado no MySQL como JSON
+// Guarda o modelo treinado no MySQL como JSON
 async function saveTrainedModel(modelName, trainedData, limit) {
     const connection = await getConnection();
     try {
@@ -34,8 +34,7 @@ async function saveTrainedModel(modelName, trainedData, limit) {
 async function loadLatestTrainedModel(modelName, limit) {
     const connection = await getConnection();
     try {
-
-        let sql = 'SELECT trained_json, _limit FROM eai_final_project.trained_models WHERE model_name = ? and _limit = ? ';//ORDER BY created_at DESC LIMIT 1
+        let sql = 'SELECT trained_json, _limit FROM eai_final_project.trained_models WHERE model_name = ? and _limit = ?';
         const [rows] = await connection.execute(sql, [modelName, limit]);
 
         if (rows.length > 0) {
@@ -45,7 +44,6 @@ async function loadLatestTrainedModel(modelName, limit) {
             console.log(`Nenhum modelo "${modelName}" encontrado na bd.`);
             return null;
         }
-
     } finally {
         await connection.end();
     }

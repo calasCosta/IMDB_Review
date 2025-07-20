@@ -4,6 +4,12 @@
 
   <h2 class="page-title">Sentiment Analysis</h2>
 
+  <% if (error) { %>
+    <div class="alert alert-danger">
+      <strong>Error:</strong> <%= error %>
+    </div>
+  <% } %>
+  
   <form action="/classify" method="POST" class="card form-card">
     <div class="form-group">
       <textarea name="text" id="text" rows="6" placeholder="Escreva aqui a sua crítica..." required><%= typeof text !== 'undefined' ? text : '' %></textarea>
