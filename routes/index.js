@@ -163,7 +163,6 @@ router.get('/stats', async (req, res) => {
       matrix,
       metrics,
       limit,
-      //trainedData,
     };
     
     await saveStatsResult(statsData);

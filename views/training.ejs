@@ -11,37 +11,95 @@
     </h3>
 
     <h4>Top Terms (Unigrams & Bigrams)</h4>
-    <% for (let n in classData.topKPerN) { %>
+    <% for (let n in classData.topKPerN) { 
+         let chartId = `tfidf-${className}-${n}`; %>
       <b><%= n === "1" ? "Unigrams" : "Bigrams" %>:</b>
-      <ul>
-        <% classData.topKPerN[n].slice(0, 10).forEach(term => { %>
-          <li>
-            <b><%= term.name %></b>
-            (TF-IDF: <%= term.tfidf?.toFixed(4) %>)
-          </li>
-        <% }) %>
-      </ul>
+      <canvas id="<%= chartId %>" style="margin-bottom:20px;"></canvas>
     <% } %>
 
     <h4>IDF Values</h4>
-    <% for (let n in classData.idfPerN) { %>
+    <% for (let n in classData.idfPerN) { 
+         let chartId = `idf-${className}-${n}`; %>
       <b><%= n === "1" ? "Unigrams" : "Bigrams" %>:</b>
-      <ul>
-        <% classData.idfPerN[n].slice(0, 10).forEach(term => { %>
-          <li>
-            <b><%= term.name %></b>
-            (IDF: <%= term.idf?.toFixed(4) %>)
-          </li>
-        <% }) %>
-      </ul>
+      <canvas id="<%= chartId %>" style="margin-bottom:20px;"></canvas>
     <% } %>
 
     <h4>Vocabulary Size</h4>
     <% for (let n in classData.vocabPerN) { %>
       <b><%= n === "1" ? "Unigrams" : "Bigrams" %>:</b>
-      <span><%= classData.vocabPerN[n].length %> terms</span>
+      <span><%= classData.vocabPerN[n].length %> terms</span><br>
     <% } %>
   </div>
 <% } %>
+
+
+<!-- Embed server-side data as JS object -->
+<script>
+  const tfidfData = <%- JSON.stringify(
+    Object.entries(trainedData).flatMap(([className, classData]) =>
+      Object.entries(classData.topKPerN).map(([n, terms]) => ({
+        chartId: `tfidf-${className}-${n}`,
+        className,
+        ngram: n === '1' ? 'Unigrams' : 'Bigrams',
+        labels: terms.slice(0, 10).map(t => t.name),
+        values: terms.slice(0, 10).map(t => Number(t.tfidf?.toFixed(4)))
+      }))
+    )
+  ) %>;
+
+  const idfData = <%- JSON.stringify(
+    Object.entries(trainedData).flatMap(([className, classData]) =>
+      Object.entries(classData.idfPerN).map(([n, terms]) => ({
+        chartId: `idf-${className}-${n}`,
+        className,
+        ngram: n === '1' ? 'Unigrams' : 'Bigrams',
+        labels: terms.slice(0, 10).map(t => t.name),
+        values: terms.slice(0, 10).map(t => Number(t.idf?.toFixed(4)))
+      }))
+    )
+  ) %>;
+</script>
+
+
+<!-- Render the charts -->
+<script>
+  const renderBarChart = (id, label, labels, data, title) => {
+    const ctx = document.getElementById(id);
+    if (!ctx) return;
+    new Chart(ctx, {
+      type: 'polarArea',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: label,
+          data: data,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: title
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  };
+
+  tfidfData.forEach(entry => {
+    renderBarChart(entry.chartId, 'TF-IDF', entry.labels, entry.values, `${entry.className} - ${entry.ngram} (TF-IDF)`);
+  });
+
+  idfData.forEach(entry => {
+    renderBarChart(entry.chartId, 'IDF', entry.labels, entry.values, `${entry.className} - ${entry.ngram} (IDF)`);
+  });
+</script>
 
 <%- include('components/footer') %>

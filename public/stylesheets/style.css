@@ -299,6 +299,16 @@ h1, h2, h3 {
   border-color: #ebccd1;
 }
 
+
+.chart-container{
+  width: 100%;
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+}
+
+
+
 /* ======= Footer ======= */
 footer {
   
