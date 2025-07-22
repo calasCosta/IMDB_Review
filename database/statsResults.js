@@ -57,5 +57,24 @@ async function getStatsResults(limit) {
     }
 }
 
+async function saveLowQualityText(text, score) {
+  const connection = await getConnection();
+  const query = 'INSERT INTO low_quality_texts (text, score) VALUES (?, ?)';
+  await connection.execute(query, [text, score]);
+  connection.end();
+}
 
-module.exports = { saveStatsResult, getStatsResults };
+async function getLowQualityTexts() {
+  const connection = await getConnection();
+  const query = 'SELECT text, score, created_at FROM low_quality_texts ORDER BY created_at DESC';
+  const [rows] = await connection.execute(query);
+  connection.end();
+  return rows;
+}
+
+module.exports = { 
+    saveStatsResult, 
+    getStatsResults, 
+    saveLowQualityText,
+    getLowQualityTexts
+};

@@ -34,3 +34,10 @@ CREATE TABLE stats_results (
   metrics JSON NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE low_quality_texts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  text TEXT NOT NULL,
+  score INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

@@ -7,7 +7,7 @@ const { cosineSimilarity, probabilisticClassification } = require('../classifica
 
 const { createConfusionMatrix, calculateMetrics } = require('../classification/stats.js');
 const { saveTrainedModel, loadLatestTrainedModel } = require('../database/trainedModels.js');
-const { saveStatsResult, getStatsResults } = require('../database/statsResults');
+const { saveStatsResult, getStatsResults, saveLowQualityText, getLowQualityTexts } = require('../database/statsResults');
 
 const { validateText } = require('../classification/languageCheck');
 
@@ -54,13 +54,23 @@ router.get('/training', async (req, res) => {
 });
 
 // GET /classify — mostra form
-router.get('/classify', (req, res) => {
-  res.render('classify', {
-    result: null,
-    text: '',
-    model: 'cosine',
-    error: null
-  });
+router.get('/classify', async (req, res) => {
+  try {
+    // Buscar textos inválidos
+    const lowQualityTexts = await getLowQualityTexts();
+
+    // Renderizar a view com os textos inválidos
+    res.render('classify', {
+      result: null,
+      text: '',
+      model: 'cosine',
+      error: null,
+      lowQualityTexts, // Passar os textos inválidos para a view
+    });
+  } catch (error) {
+    console.error('Erro ao buscar textos inválidos:', error);
+    res.render('error', { message: 'Erro ao carregar a página de classificação.', error });
+  }
 });
 
 // POST /classify — classifica texto
@@ -70,6 +80,7 @@ router.post('/classify', async (req, res) => {
   let textScore = 0;
 
   let validationTextResult = await validateText(text);
+   
 
   console.log('Validation Results:');
   console.log('Overall Valid:', validationTextResult.isValid);
@@ -82,10 +93,15 @@ router.post('/classify', async (req, res) => {
   try {
     if (!text || typeof text !== 'string' || text.trim().length === 0 || textScore < 90) {
       console.log('Invalid text or low quality score:', text, textScore);
+
+      await saveLowQualityText(text, textScore);
+      const lowQualityTexts = await getLowQualityTexts();
+
       return res.render('classify', {
         result: null,
         text,
         model: selectedModel,
+        lowQualityTexts,
         error: `Invalid text. Your current text score is ${textScore}. Ensure it has a quality score of at least 90.`
       });
     }

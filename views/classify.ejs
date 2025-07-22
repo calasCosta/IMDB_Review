@@ -62,6 +62,26 @@
     </div>
   <% } %>
 
+  <% if (lowQualityTexts && lowQualityTexts.length > 0) { %>
+    <div class="card low-quality-card">
+      <h3>Low Quality Texts</h3>
+      <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#lowQualityTexts" aria-expanded="false" aria-controls="lowQualityTexts">
+        Show/Hide Texts
+      </button>
+      <div class="collapse" id="lowQualityTexts">
+        <ul class="low-quality-list">
+          <% lowQualityTexts.forEach(text => { %>
+            <li>
+              <strong>Score:</strong> <%= text.score %> | 
+              <strong>Date:</strong> <%= new Date(text.created_at).toLocaleString() %><br>
+              <%= text.text %>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+  <% } %>
+
 </div>
 
 <%- include('components/footer') %>

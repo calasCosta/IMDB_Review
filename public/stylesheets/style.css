@@ -302,7 +302,7 @@ h1, h2, h3 {
 
 .chart-container{
   width: 100%;
-  max-width: 800px;
+  max-width: 600px;
   margin: auto;
   padding: 20px;
 }
