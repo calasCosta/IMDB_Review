@@ -81,7 +81,6 @@ router.post('/classify', async (req, res) => {
 
   let validationTextResult = await validateText(text);
    
-
   console.log('Validation Results:');
   console.log('Overall Valid:', validationTextResult.isValid);
   console.log('Spelling Errors:', validationTextResult.spellingErrors);
@@ -89,13 +88,12 @@ router.post('/classify', async (req, res) => {
   textScore = validationTextResult.score;
   console.log('Quality Score:', textScore);
 
-
   try {
+    const lowQualityTexts = await getLowQualityTexts();
+
     if (!text || typeof text !== 'string' || text.trim().length === 0 || textScore < 90) {
       console.log('Invalid text or low quality score:', text, textScore);
-
       await saveLowQualityText(text, textScore);
-      const lowQualityTexts = await getLowQualityTexts();
 
       return res.render('classify', {
         result: null,
@@ -119,7 +117,13 @@ router.post('/classify', async (req, res) => {
       result = await probabilisticClassification(text, trainedData, [1, 2]);
     }
 
-    res.render('classify', { text, model: selectedModel, result, error: null});
+    res.render('classify', { 
+      text, 
+      model: selectedModel, 
+      result, 
+      lowQualityTexts,
+      error: null
+    });
 
   } catch (error) {
     console.error('Erro ao classificar:', error);

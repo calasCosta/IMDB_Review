@@ -419,3 +419,64 @@ footer a:hover {
     padding: 14px 2px 10px 2px;
   }
 }
+
+
+
+
+
+
+/* Estilo para o botão de colapso */
+.btn-secondary {
+  background-color: #6c757d;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+/* Estilo para a seção colapsável */
+.low-quality-card {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.low-quality-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.low-quality-list li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.low-quality-list li:last-child {
+  border-bottom: none;
+}
+
+/* Estilo para o texto expandido */
+.collapse {
+  display: none;
+}
+
+.collapse.show {
+  display: block;
+}
+
+
+
+
+
+
+

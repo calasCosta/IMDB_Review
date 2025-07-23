@@ -65,8 +65,8 @@
   <% if (lowQualityTexts && lowQualityTexts.length > 0) { %>
     <div class="card low-quality-card">
       <h3>Low Quality Texts</h3>
-      <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#lowQualityTexts" aria-expanded="false" aria-controls="lowQualityTexts">
-        Show/Hide Texts
+      <button class="btn btn-secondary" id="btn_hide_show" type="button" data-toggle="collapse" data-target="#lowQualityTexts" aria-expanded="false" aria-controls="lowQualityTexts">
+        Show Texts
       </button>
       <div class="collapse" id="lowQualityTexts">
         <ul class="low-quality-list">
@@ -83,5 +83,22 @@
   <% } %>
 
 </div>
+
+<script>
+  document.querySelectorAll('[data-toggle="collapse"]').forEach(button => {
+    button.addEventListener('click', () => {
+      const target = document.querySelector(button.getAttribute('data-target'));
+      if (target) {
+        if (target.style.display === 'block') {
+          target.style.display = 'none'; // Ocultar
+          document.getElementById('btn_hide_show').textContent = 'Show Texts'; // Atualizar texto do botão
+        } else {
+          target.style.display = 'block'; // Exibir
+          document.getElementById('btn_hide_show').textContent = 'Hide Texts'; // Atualizar texto do botão
+        }
+      }
+    });
+  });
+</script>
 
 <%- include('components/footer') %>
